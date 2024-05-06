@@ -30,7 +30,7 @@ class TransferController extends Controller
     public function store(Request $request)
     {
         $data = $request->only('amount', 'pin', 'send_to');
-            
+
         $validator = Validator::make($data, [
             'amount' => 'required|integer|min:1000',
             'pin' => 'required|digits:6',
@@ -43,17 +43,17 @@ class TransferController extends Controller
 
         $sender = auth()->user();
         $paymentMethod = PaymentMethod::where('code', 'bwa')->first();
-        $receiver = User::select('users.id', 'users.username')
-                            ->join('wallets', 'wallets.user_id', 'users.id')
-                            ->where('users.username', $request->send_to)
-                            ->orWhere('wallets.card_number', $request->send_to)
-                            ->first();
+        $receiver = User::select('users.id', 'users.email')
+            ->join('wallets', 'wallets.user_id', 'users.id')
+            ->where('users.email', $request->send_to)
+            ->orWhere('wallets.card_number', $request->send_to)
+            ->first();
 
         $pinChecker = pinChecker($request->pin);
         if (!$pinChecker) {
             return response()->json(['message' => 'Your PIN is wrong'], 400);
         }
-        
+
         if (!$receiver) {
             return response()->json(['message' => 'User receiver not found'], 404);
         }
@@ -63,7 +63,7 @@ class TransferController extends Controller
         }
 
         $senderWallet = Wallet::where('user_id', $sender->id)->first();
-        
+
         if ($senderWallet->balance < $request->amount) {
             return response()->json(['message' => 'Your balance is not enough'], 400);
         }
@@ -71,8 +71,8 @@ class TransferController extends Controller
         DB::beginTransaction();
         try {
             $transactionType = TransactionType::whereIn('code', ['receive', 'transfer'])
-                                                ->orderBy('code', 'asc')
-                                                ->get();
+                ->orderBy('code', 'asc')
+                ->get();
 
             $receiveTransactionType = $transactionType->first();
             $transferTransactionType = $transactionType->last();
@@ -81,7 +81,7 @@ class TransferController extends Controller
             $transferTransaction = $this->createTransaction([
                 'user_id' => $sender->id,
                 'transaction_type_id' => $transferTransactionType->id,
-                'description' => 'Transfer funds to '.$receiver->username,
+                'description' => 'Transfer funds to ' . $receiver->username,
                 'amount' => $request->amount
             ]);
 
@@ -91,7 +91,7 @@ class TransferController extends Controller
             $receiveTransaction = $this->createTransaction([
                 'user_id' => $receiver->id,
                 'transaction_type_id' => $receiveTransactionType->id,
-                'description' => 'Receive funds from '.$sender->username,
+                'description' => 'Receive funds from ' . $sender->username,
                 'amount' => $request->amount
             ]);
 
@@ -112,7 +112,7 @@ class TransferController extends Controller
     }
 
     private function createTransaction($params)
-    {        
+    {
         $transaction = Transaction::create([
             'user_id' => $params['user_id'],
             'transaction_type_id' => $params['transaction_type_id'],
