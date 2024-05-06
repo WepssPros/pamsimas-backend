@@ -60,8 +60,7 @@ class TopUpController extends Controller
             // Now, let's update the wallet with the fields from the request
             $wallet->update([
                 'balance' => $request->balance,
-                'pin' => $request->pin,
-                'card_number' => $request->card_number
+
             ]);
 
             $midtrans = $this->callMidtrans($params);
