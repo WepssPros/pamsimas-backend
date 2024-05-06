@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\TransactionType;
 use App\Models\PaymentMethod;
+use App\Models\Wallet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -16,13 +17,13 @@ class TopUpController extends Controller
     public function store(Request $request)
     {
         $data = $request->only('amount', 'pin', 'payment_method_code');
-        
+
         $validator = Validator::make($data, [
-           'amount' => 'required|integer|min:10000',
-           'pin' => 'required|digits:6',
-           'payment_method_code' => 'required|in:bni_va,bca_va,bri_va'
+            'amount' => 'required|integer|min:10000',
+            'pin' => 'required|digits:6',
+            'payment_method_code' => 'required|in:bni_va,bca_va,bri_va'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->messages()], 400);
         }
@@ -44,7 +45,7 @@ class TopUpController extends Controller
                 'transaction_type_id' => $transactionType->id,
                 'amount' => $request->amount,
                 'transaction_code' => strtoupper(Str::random(10)),
-                'description' => 'Top Up via '.$paymentMethod->name,
+                'description' => 'Top Up via ' . $paymentMethod->name,
                 'status' => Transaction::STATUS_PENDING
             ]);
 
@@ -54,8 +55,17 @@ class TopUpController extends Controller
                 'payment_method' => $paymentMethod->code
             ]);
 
+            $wallet = Wallet::where('user_id', auth()->user()->id)->first(); // Fetch the wallet based on the user_id from the request
+
+            // Now, let's update the wallet with the fields from the request
+            $wallet->update([
+                'balance' => $request->balance,
+                'pin' => $request->pin,
+                'card_number' => $request->card_number
+            ]);
+
             $midtrans = $this->callMidtrans($params);
-            
+
             DB::commit();
 
             return response()->json($midtrans);
@@ -110,7 +120,7 @@ class TopUpController extends Controller
     private function splitName($fullName)
     {
         $name = explode(' ', $fullName);
-        
+
         $lastName = count($name)  > 1 ? array_pop($name) : $fullName;
         $firstName = implode(' ', $name);
 
