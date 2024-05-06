@@ -46,7 +46,7 @@ class TopUpController extends Controller
                 'amount' => $request->amount,
                 'transaction_code' => strtoupper(Str::random(10)),
                 'description' => 'Top Up via ' . $paymentMethod->name,
-                'status' => Transaction::STATUS_PENDING
+                'status' => Transaction::STATUS_SUCCESS
             ]);
 
             $params = $this->buildMidtransParameter([
