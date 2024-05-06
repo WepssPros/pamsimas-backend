@@ -43,9 +43,9 @@ class TransferController extends Controller
 
         $sender = auth()->user();
         $paymentMethod = PaymentMethod::where('code', 'bwa')->first();
-        $receiver = User::select('users.id', 'users.email')
+        $receiver = User::select('users.id', 'users.username')
             ->join('wallets', 'wallets.user_id', 'users.id')
-            ->where('users.email', $request->send_to)
+            ->where('users.username', $request->send_to)
             ->orWhere('wallets.card_number', $request->send_to)
             ->first();
 
