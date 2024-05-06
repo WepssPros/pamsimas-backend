@@ -29,14 +29,14 @@ class TransactionController extends Controller
 
         $transactions->getCollection()->transform(function ($item) {
             $paymentMethodThumbnail = $item->paymentMethod->thumbnail ?
-                url('storage' . $item->paymentMethod->thumbnail)
+                url('storage/' . $item->paymentMethod->thumbnail)
                 : '';
             $item->paymentMethod = clone $item->paymentMethod;
             $item->paymentMethod->thumbnail = $paymentMethodThumbnail;
 
             $transactionType = $item->transactionType;
-
-            url('storage/' . $transactionType->thumbnail);
+            $item->transactionType->thumbnail =
+                url('storage/' . $transactionType->thumbnail);
 
             return $item;
         });
