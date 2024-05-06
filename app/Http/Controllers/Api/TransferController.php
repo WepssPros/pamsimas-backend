@@ -70,12 +70,24 @@ class TransferController extends Controller
 
         DB::beginTransaction();
         try {
-            $transactionType = TransactionType::whereIn('code', ['receive', 'transfer'])
+            // Fetch transaction types
+            $transactionTypes = TransactionType::whereIn('code', ['receive', 'transfer'])
                 ->orderBy('code', 'asc')
                 ->get();
 
-            $receiveTransactionType = $transactionType->first();
-            $transferTransactionType = $transactionType->last();
+            // Check if transaction types exist
+            if ($transactionTypes->isEmpty()) {
+                throw new \Exception('Transaction types not found.');
+            }
+
+            // Get the first and last transaction type
+            $receiveTransactionType = $transactionTypes->where('code', 'receive')->first();
+            $transferTransactionType = $transactionTypes->where('code', 'transfer')->first();
+
+            // Ensure sender and receiver exist
+            if (!$sender || !$receiver) {
+                throw new \Exception('Sender or receiver not found.');
+            }
 
             // Create transaction for transfer
             $transferTransaction = $this->createTransaction([
@@ -85,9 +97,10 @@ class TransferController extends Controller
                 'amount' => $request->amount
             ]);
 
+            // Deduct balance from sender wallet
             $senderWallet->decrement('balance', $request->amount);
 
-            // craete transaction for receive
+            // Create transaction for receive
             $receiveTransaction = $this->createTransaction([
                 'user_id' => $receiver->id,
                 'transaction_type_id' => $receiveTransactionType->id,
@@ -95,17 +108,21 @@ class TransferController extends Controller
                 'amount' => $request->amount
             ]);
 
+            // Increment balance for receiver wallet
             Wallet::where('user_id', $receiver->id)->increment('balance', $request->amount);
 
+            // Record transfer history
             TransferHistory::create([
                 'sender_id' => $sender->id,
                 'receiver_id' => $receiver->id,
                 'transaction_code' => $this->transactionCode
             ]);
 
+            // Commit transaction
             DB::commit();
             return response(['message' => 'Transfer Success']);
         } catch (\Throwable $th) {
+            // Rollback transaction on error
             DB::rollback();
             return response()->json(['message' => $th->getMessage()], 500);
         }
