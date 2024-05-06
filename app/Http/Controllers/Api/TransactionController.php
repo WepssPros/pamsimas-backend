@@ -36,7 +36,8 @@ class TransactionController extends Controller
             $transactionType = $item->transactionType;
             $item->transactionType->thumbnail =
                 url('storage/' . $transactionType->thumbnail);
-
+            $item->transactionType = clone $item->transactionType;
+            $item->transactionType->thumbnail = $transactionType;
             return $item;
         });
 
