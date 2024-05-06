@@ -43,15 +43,13 @@ class TransferController extends Controller
 
         $sender = auth()->user();
         $paymentMethod = PaymentMethod::where('code', 'bwa')->first();
-        // $receiver = User::select('users.id', 'users.username')
-        //     ->join('wallets', 'wallets.user_id', 'users.id')
-        //     ->where('users.username', $request->send_to)
-        //     ->orWhere('wallets.card_number', $request->send_to)
-        //     ->first();
+        $receiver = User::select('users.id', 'users.username')
+            ->join('wallets', 'wallets.user_id', 'users.id')
+            ->where('users.username', $request->send_to)
+            ->orWhere('wallets.card_number', $request->send_to)
+            ->first();
 
-        $receiver = User::where([
-            'username' => $request->send_to,
-        ])->first();
+        #
         $pinChecker = pinChecker($request->pin);
         if (!$pinChecker) {
             return response()->json(['message' => 'Your PIN is wrong'], 400);
