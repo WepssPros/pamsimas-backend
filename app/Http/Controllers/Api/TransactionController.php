@@ -30,22 +30,31 @@ class TransactionController extends Controller
         $transactions->getCollection()->transform(function ($item) {
             // Ambil URL thumbnail metode pembayaran atau kosongkan jika tidak tersedia
             $paymentMethodThumbnail = $item->paymentMethod->thumbnail
-                ? url('storage/' . $item->paymentMethod->thumbnail)
+                ? $item->paymentMethod->thumbnail
                 : '';
 
-            // Setel URL thumbnail pada objek metode pembayaran
-            $item->paymentMethod->thumbnail = $paymentMethodThumbnail;
+            // Setel URL thumbnail pada objek metode pembayaran jika thumbnail tersedia
+            if ($paymentMethodThumbnail) {
+                $item->paymentMethod->thumbnail = strpos($paymentMethodThumbnail, 'http') === 0
+                    ? $paymentMethodThumbnail
+                    : url('storage/' . $paymentMethodThumbnail);
+            }
 
             // Ambil URL thumbnail tipe transaksi atau kosongkan jika tidak tersedia
             $transactionTypeThumbnail = $item->transactionType->thumbnail
-                ? url('storage/' . $item->transactionType->thumbnail)
+                ? $item->transactionType->thumbnail
                 : '';
 
-            // Setel URL thumbnail pada objek tipe transaksi
-            $item->transactionType->thumbnail = $transactionTypeThumbnail;
+            // Setel URL thumbnail pada objek tipe transaksi jika thumbnail tersedia
+            if ($transactionTypeThumbnail) {
+                $item->transactionType->thumbnail = strpos($transactionTypeThumbnail, 'http') === 0
+                    ? $transactionTypeThumbnail
+                    : url('storage/' . $transactionTypeThumbnail);
+            }
 
             return $item;
         });
+
 
         return response()->json($transactions);
     }
