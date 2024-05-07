@@ -28,16 +28,22 @@ class TransactionController extends Controller
             ->paginate($limit);
 
         $transactions->getCollection()->transform(function ($item) {
-            $paymentMethodThumbnail = $item->paymentMethod->thumbnail ?
-                url('storage/' . $item->paymentMethod->thumbnail) : '';
-            $item->paymentMethod = clone $item->paymentMethod;
+            // Ambil URL thumbnail metode pembayaran atau kosongkan jika tidak tersedia
+            $paymentMethodThumbnail = $item->paymentMethod->thumbnail
+                ? url('storage/' . $item->paymentMethod->thumbnail)
+                : '';
+
+            // Setel URL thumbnail pada objek metode pembayaran
             $item->paymentMethod->thumbnail = $paymentMethodThumbnail;
 
-            $transactionType = $item->transactionType;
-            $item->transactionType->thumbnail = $transactionType->thumbnail ?
-                url('storage/' . $transactionType->thumbnail) : '';
-            $item->transactionType = clone $item->transactionType;
-            $item->$transactionType->thumbnail = $transactionType;
+            // Ambil URL thumbnail tipe transaksi atau kosongkan jika tidak tersedia
+            $transactionTypeThumbnail = $item->transactionType->thumbnail
+                ? url('storage/' . $item->transactionType->thumbnail)
+                : '';
+
+            // Setel URL thumbnail pada objek tipe transaksi
+            $item->transactionType->thumbnail = $transactionTypeThumbnail;
+
             return $item;
         });
 
