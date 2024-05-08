@@ -17,12 +17,11 @@ class GetTagihanController extends Controller
 
 
         $user = auth()->user();
-        $nopam = NoPam::where('user_id', $user->id);
-        $tagihanPams = Tagihan_Pam::with($user)
-            ->where('user_id', $user->id)
-            ->where('pam_id', $nopam->id)
-            ->latest()
-            ->paginate($limit);
+        $nopam = NoPam::where('user_id', $user->id)->first();
+        $tagihanPams = Tagihan_Pam::where([
+            'user_id' => $user->id,
+            'pam_id'  => $nopam->id,
+        ])->latest()->paginate($limit);
 
 
 
