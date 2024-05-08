@@ -55,9 +55,9 @@ class TopUpController extends Controller
                 'payment_method' => $paymentMethod->code
             ]);
 
-            $wallet = Wallet::where('user_id', auth()->user()->id)->first(); // Fetch the wallet based on the user_id from the request
+            $wallet = Wallet::where('user_id', auth()->user()->id)->first();
 
-            // Now, let's update the wallet with the fields from the request
+
             $wallet->update([
                 'balance' => $wallet->balance + $request->amount,
             ]);
