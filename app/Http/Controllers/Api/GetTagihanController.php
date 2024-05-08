@@ -23,7 +23,12 @@ class GetTagihanController extends Controller
             'pam_id'  => $nopam->id,
         ])->latest()->paginate($limit);
 
+        $tagihanPams->getCollection()->transform(function ($item) {
 
+            $noPam = $item->noPam->no_pam;
+
+            return $item;
+        });
 
 
         return response()->json($tagihanPams);
