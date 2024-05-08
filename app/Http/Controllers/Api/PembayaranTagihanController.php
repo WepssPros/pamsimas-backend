@@ -33,10 +33,10 @@ class PembayaranTagihanController extends Controller
         $validator = Validator::make($data, [
             'amount' => 'required|integer|min:1000',
             'pin' => 'required|digits:6',
-            'tagihanpam_id' => 'required'
+            'tagihanpam_id' => 'required|integer'
         ]);
 
-        
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->messages()], 400);
         }
