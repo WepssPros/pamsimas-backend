@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\TransferHistoryController;
 use App\Http\Controllers\Api\TipController;
 use App\Http\Controllers\Api\OperatorCardController;
 use App\Http\Controllers\Api\DataPlanController;
+use App\Http\Controllers\Api\GetTagihanController;
 use App\Http\Controllers\Api\PembayaranTagihanController;
 
 /*
@@ -54,6 +55,7 @@ Route::group(['middleware' => 'jwt.verify'], function ($router) {
     Route::post('data_plans', [DataPlanController::class, 'store']);
 
     Route::get('transactions', [TransactionController::class, 'index']);
+    Route::get('tagihanpams', [GetTagihanController::class, 'index']);
 
     Route::get('payment_methods', [PaymentMethodController::class, 'index']);
 
