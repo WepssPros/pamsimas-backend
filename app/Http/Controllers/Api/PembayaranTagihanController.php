@@ -43,10 +43,12 @@ class PembayaranTagihanController extends Controller
             return response()->json(['message' => 'Data plan not found'], 404);
         }
 
-     
 
+        if ($tagihanPam->status_pembayaran == "sudah dibayar") {
+            return response()->json(['message' => 'Sudah Melakukan Pembayaran'], 400);
+        }
         if ($userWallet->balance < $tagihanPam->harga) {
-            return response()->json(['message' => 'Your balance is not enough'], 400);
+            return response()->json(['message' => 'Dana Mu Tidak Cukup'], 400);
         }
 
         DB::beginTransaction();
