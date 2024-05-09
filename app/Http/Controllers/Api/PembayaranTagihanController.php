@@ -43,10 +43,7 @@ class PembayaranTagihanController extends Controller
             return response()->json(['message' => 'Data plan not found'], 404);
         }
 
-        $pinChecker = pinChecker($request->pin);
-        if (!$pinChecker) {
-            return response()->json(['message' => 'Your PIN is wrong'], 400);
-        }
+     
 
         if ($userWallet->balance < $tagihanPam->harga) {
             return response()->json(['message' => 'Your balance is not enough'], 400);
