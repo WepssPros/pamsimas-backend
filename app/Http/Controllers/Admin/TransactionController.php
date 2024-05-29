@@ -18,8 +18,8 @@ class TransactionController extends Controller
         ];
 
         $transactions = Transaction::with($relations)
-                                    ->orderBy('created_at', 'desc')
-                                    ->get();
+            ->orderBy('created_at', 'desc')
+            ->latest()->get();
 
         return view('transaction', ['transactions' => $transactions]);
     }
