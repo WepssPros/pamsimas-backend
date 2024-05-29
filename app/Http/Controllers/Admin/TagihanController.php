@@ -18,7 +18,7 @@ class TagihanController extends Controller
      */
     public function index()
     {
-        $tagihanpams = Tagihan_Pam::all();
+        $tagihanpams = Tagihan_Pam::latest()->get();
 
         // Menambahkan properti baru untuk menyimpan jarak bulan antara tanggal jatuh tempo dan tanggal saat ini
         $tagihanpams->each(function ($tagihanpam) {
