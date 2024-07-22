@@ -16,7 +16,7 @@ class PaymentMethodSeeder extends Seeder
     {
         DB::table('payment_methods')->insert([
             [
-                'name' => 'Bank BWA',
+                'name' => 'Pamsimas Bank',
                 'code' => 'bwa',
                 'status' => 'active',
                 'created_at' => now(),
